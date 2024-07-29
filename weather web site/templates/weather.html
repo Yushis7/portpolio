@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Weather for {{ weather.name }}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <!-- Custom CSS -->
+    <link href="/static/style.css" rel="stylesheet">
+    <style>
+      #map {
+        height: 500px;  /* 지도의 높이를 설정 */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="mt-5"  style="font-size:50px;">Weather for {{ weather.name }}</h1>
+      {% if weather.main %}
+      <p style="font-size:30px;"><b>날씨: {{ weather.weather[0].description }}</b></p>
+        <p style="font-size:30px;"><b>온도: {{ weather.main.temp | round(2) }}°C</b></p>
+        <p style="font-size:30px;"><b>체감 온도: {{ weather.main.feels_like | round(2) }}°C</b></p>
+        <p style="font-size:30px;"><b>최대온도: {{ weather.main.temp_max | round(2) }}°C</b></p>
+        <p style="font-size:30px;"><b>최저온도: {{ weather.main.temp_min | round(2) }}°C</b></p>
+        <p style="font-size:30px;"><b>기압: {{ weather.main.pressure }} hPa</b></p>
+        <p style="font-size:30px;"><b>습도: {{ weather.main.humidity }}%</b></p>
+        <p style="font-size:30px;"><b>가시성: {{ weather.visibility }} meters</b></p>
+        <p style="font-size:30px;"><b>구름: {{ weather.clouds.all }}%</b></p>
+        {% if weather.rain %}
+          <p>Rain Volume (1h): {{ weather.rain['1h'] }} mm</b></p>
+        {% endif %}
+        {% if weather.snow %}
+          <p>Snow Volume (1h): {{ weather.snow['1h'] }} mm</b></p>
+        {% endif %}
+        <p style="font-size:30px;"><b>풍속: {{ weather.wind.speed }} m/s</b></p>
+        <p style="font-size:30px;"><b>풍향: {{ weather.wind.deg }}°</b></p>
+        {% if weather.pollution %}
+          <p style="font-size:30px;"><b>미세먼지 (PM2.5): {{ weather.pollution.components.pm2_5 }} µg/m³</b></p>
+        {% endif %}
+      {% else %}
+        <p>Weather data not available.</p>
+      {% endif %}
+      <div id="map"></div>
+      <a href="/" class="btn btn-secondary mt-3">Back</a>
+    </div>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+      var map = L.map('map').setView([{{ weather.coord.lat }}, {{ weather.coord.lon }}], 10);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      L.marker([{{ weather.coord.lat }}, {{ weather.coord.lon }}]).addTo(map)
+        .bindPopup('<b>{{ weather.name }}</b><br>Temperature: {{ weather.main.temp | round(2) }}°C<br>Feels Like: {{ weather.main.feels_like | round(2) }}°C<br>Max Temperature: {{ weather.main.temp_max | round(2) }}°C<br>Min Temperature: {{ weather.main.temp_min | round(2) }}°C<br>Pressure: {{ weather.main.pressure }} hPa<br>Humidity: {{ weather.main.humidity }}%<br>Visibility: {{ weather.visibility }} meters<br>Cloudiness: {{ weather.clouds.all }}%<br>{% if weather.rain %}Rain Volume (1h): {{ weather.rain['1h'] }} mm<br>{% endif %}{% if weather.snow %}Snow Volume (1h): {{ weather.snow['1h'] }} mm<br>{% endif %}Wind Speed: {{ weather.wind.speed }} m/s<br>Wind Direction: {{ weather.wind.deg }}°<br>Weather: {{ weather.weather[0].description }}<br>{% if weather.pollution %}Fine Dust (PM2.5): {{ weather.pollution.components.pm2_5 }} µg/m³{% endif %}')
+        .openPopup();
+    </script>
+  </body>
+</html>
