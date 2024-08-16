@@ -22,3 +22,12 @@ https://junportpolio3.netlify.app/
 ![스크린샷 2024-08-16 161634](https://github.com/user-attachments/assets/f6f8d585-def9-405b-8e66-40e083ae7448)
 
 윈도우에서 제공하는 계산기와 유사하게 업데이트
+
+![스크린샷 2024-08-16 161906](https://github.com/user-attachments/assets/1956f9d0-db1f-4e54-96f3-2ec75e6d121b)
+도시 검색시 온도,최저최대온도,체감온도,기압,습도,가시성,구름 정도 등 상세히 알 수 있도록 보여주는 사이트
+
+
+![스크린샷 2024-08-16 170946](https://github.com/user-attachments/assets/55a30b50-6e6f-4838-aca5-099cd7d82ee7)
+![스크린샷 2024-08-16 170655](https://github.com/user-attachments/assets/32fbf77e-3e7a-4cc8-94ac-ab9b9b581a75)
+
+간단한 메모 웹사이트 및 게시판 crud사이트
