@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메모 앱</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+</head>
+<body>
+    <h1>june의 메모 게시판</h1>
+    <ul>
+        {% for note in notes %}
+        <li>
+            <h2>{{ note.title }}</h2>
+            <p>{{ note.content }}</p>
+            <a href="{{ url_for('delete_note', note_id=loop.index0) }}">삭제</a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <h2>새 메모 추가</h2>
+    <form action="{{ url_for('add_note') }}" method="POST">
+        <label for="title">제목:</label><br>
+        <input type="text" id="title" name="title" required><br>
+        <label for="content">내용:</label><br>
+        <textarea id="content" name="content" required></textarea><br>
+        <button type="submit">추가</button>
+    </form>
+</body>
+</html>
