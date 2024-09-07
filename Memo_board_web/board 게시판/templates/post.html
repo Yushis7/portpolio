@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+    <h2>{{ post.title }}</h2>
+    <p>{{ post.content }}</p>
+    
+    <h3>댓글</h3>
+    <ul>
+        {% for comment in post.comments %}
+        <li>{{ comment }}</li>
+        {% endfor %}
+    </ul>
+
+    <form action="{{ url_for('add_comment', post_id=post_id) }}" method="post"> <!-- post_id 사용 -->
+        <label for="comment">댓글:</label><br>
+        <textarea id="comment" name="comment" required></textarea><br>
+        <button type="submit">댓글 추가</button>
+    </form>
+
+    <a href="{{ url_for('home') }}">뒤로 가기</a>
+{% endblock %}
