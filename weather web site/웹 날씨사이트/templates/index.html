@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ _('실시간 전세계 날씨') }}</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 30px;
+            background: #f4f4f9;
+            color: #333;
+        }
+        .form-container {
+            margin-bottom: 20px;
+        }
+        input {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+            width: 300px;
+        }
+        button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        .weather-container, .favorites-container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-top: 20px;
+            background: #fff;
+            display: inline-block;
+            text-align: left;
+            width: 80%;
+        }
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ _('실시간 전세계 날씨') }}</h1>
+
+    <!-- 검색 폼 -->
+    <div class="form-container">
+        <form method="POST">
+            <input type="text" name="city" placeholder="{{ _('도시명을 입력하세요 (영어 또는 한국어)') }}" required>
+            <button type="submit">{{ _('검색') }}</button>
+        </form>
+    </div>
+
+    <!-- 날씨 정보 -->
+    {% if weather %}
+        <div class="weather-container">
+            {% if weather.error %}
+                <p class="error">{{ weather.error }}</p>
+            {% else %}
+                <h2>{{ _('현재 지역은') }} {{ weather.city }}</h2>
+                <p><strong>{{ _('온도') }}:</strong> {{ weather.temperature }}°C</p>
+                <p><strong>{{ _('체감온도') }}:</strong> {{ weather.feels_like }}°C</p>
+                <p><strong>{{ _('습도') }}:</strong> {{ weather.humidity }}%</p>
+                <p><strong>{{ _('기압') }}:</strong> {{ weather.pressure }} hPa</p>
+                <p><strong>{{ _('오늘의 날씨') }}:</strong> {{ weather.description }}</p>
+                <p><strong>{{ _('미세먼지 (PM2.5)') }}:</strong> {{ weather.pm2_5 }} µg/m³</p>
+                <p><strong>{{ _('미세먼지 (PM10)') }}:</strong> {{ weather.pm10 }} µg/m³</p>
+                <form method="POST" action="/add_favorite">
+                    <input type="hidden" name="city" value="{{ weather.city }}">
+                    <button type="submit">{{ _('즐겨찾기에 추가') }}</button>
+                </form>
+            {% endif %}
+        </div>
+
+        <!-- 지도 -->
+        {% if not weather.error %}
+            <div id="map"></div>
+            <script>
+                var map = L.map('map').setView([{{ weather.lat }}, {{ weather.lon }}], 14);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                }).addTo(map);
+                L.marker([{{ weather.lat }}, {{ weather.lon }}]).addTo(map)
+                    .bindPopup('<b>{{ weather.city }}</b><br>{{ weather.description }}')
+                    .openPopup();
+            </script>
+        {% endif %}
+    {% endif %}
+
+    <!-- 즐겨찾기 목록 -->
+    <div class="favorites-container">
+        <h2>{{ _('즐겨찾기') }}</h2>
+        <ul>
+            {% for city in favorites %}
+                <li>
+                    {{ city }}
+                    <form method="POST" action="/remove_favorite" style="display:inline;">
+                        <input type="hidden" name="city" value="{{ city }}">
+                        <button type="submit">{{ _('삭제') }}</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
