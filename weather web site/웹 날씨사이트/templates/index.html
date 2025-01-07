@@ -65,14 +65,15 @@
             {% if weather.error %}
                 <p class="error">{{ weather.error }}</p>
             {% else %}
-                <h2>{{ _('현재 지역은') }} {{ weather.city }}</h2>
-                <p><strong>{{ _('온도') }}:</strong> {{ weather.temperature }}°C</p>
-                <p><strong>{{ _('체감온도') }}:</strong> {{ weather.feels_like }}°C</p>
-                <p><strong>{{ _('습도') }}:</strong> {{ weather.humidity }}%</p>
-                <p><strong>{{ _('기압') }}:</strong> {{ weather.pressure }} hPa</p>
-                <p><strong>{{ _('오늘의 날씨') }}:</strong> {{ weather.description }}</p>
-                <p><strong>{{ _('미세먼지 (PM2.5)') }}:</strong> {{ weather.pm2_5 }} µg/m³</p>
-                <p><strong>{{ _('미세먼지 (PM10)') }}:</strong> {{ weather.pm10 }} µg/m³</p>
+                <h2>현재 지역은 {{ weather.city }}</h2>
+                <p><strong>온도:</strong> {{ weather.temperature }}°C</p>
+                <p><strong>체감온도:</strong> {{ weather.feels_like }}°C</p>
+                <p><strong>습도:</strong> {{ weather.humidity }}%</p>
+                <p><strong>기압:</strong> {{ weather.pressure }} hPa</p>
+                <p><strong>오늘의 날씨:</strong> {{ weather.description }}</p>
+                <p><strong>미세먼지 (PM2.5):</strong> {{ weather.pm2_5 }} µg/m³</p>
+                <p><strong>미세먼지 (PM10):</strong> {{ weather.pm10 }} µg/m³</p>
+
                 <form method="POST" action="/add_favorite">
                     <input type="hidden" name="city" value="{{ weather.city }}">
                     <button type="submit">{{ _('즐겨찾기에 추가') }}</button>
@@ -101,7 +102,9 @@
         <ul>
             {% for city in favorites %}
                 <li>
-                    {{ city }}
+                    <form method="GET" action="{{ url_for('favorite_weather', city_name=city) }}" style="display:inline;">
+                        <button type="submit">{{ city }}</button>
+                    </form>
                     <form method="POST" action="/remove_favorite" style="display:inline;">
                         <input type="hidden" name="city" value="{{ city }}">
                         <button type="submit">{{ _('삭제') }}</button>
