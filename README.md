@@ -40,3 +40,6 @@ A site that displays detailed information such as temperature, minimum and maxim
 
 간단한 메모 웹사이트 및 게시판 crud사이트
 Simple memo website and board crud site
+
+
+![weather](https://github.com/user-attachments/assets/ec5e102c-83f0-43c4-859d-69272797de39)
