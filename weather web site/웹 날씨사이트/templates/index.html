@@ -6,6 +6,13 @@
     <title>{{ _('실시간 전세계 날씨') }}</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <form method="POST" action="/add_favorite">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="city" value="{{ weather.city }}">
+        <button type="submit">{{ _('즐겨찾기에 추가') }}</button>
+    </form>
+    
+
     <style>
         body {
             font-family: Arial, sans-serif;
