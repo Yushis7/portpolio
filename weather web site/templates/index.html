@@ -1,31 +1,134 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Weather web site 날씨 웹사이트</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <!-- Custom CSS -->
-    <link href="/static/style.css" rel="stylesheet">
-  </head>
-  <body>
-    <div class="container">
-      <h1 class="mt-5" style="font-size:35px;"><b>오늘의 날씨</b></h1>
-      <form action="/weather" method="post" class="mt-3">
-        <div class="form-group">
-          <input type="text" name="city" class="form-control" placeholder="도시 이름을 영어로 입력하세요">
-        </div>
-        <button type="submit" class="btn btn-primary">날씨 확인하기</button>
-      </form>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ texts.title }}</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 30px;
+            background: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            font-size: 2em;
+            padding: 20px;
+            background-color: #e0e0e0;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        .form-container {
+            margin-bottom: 20px;
+        }
+        input {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+            width: 300px;
+        }
+        button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        .weather-container, .favorites-container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-top: 20px;
+            background: #fff;
+            display: inline-block;
+            text-align: left;
+            width: 70%;
+        }
+        #map {
+            height: 500px;
+            width: 72%;
+            margin-top: 20px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ texts.title }}</h1>
+
+    <!-- 검색 폼 -->
+    <div class="form-container">
+        <form method="POST">
+            {{ csrf_token() }}
+            <input type="text" name="city" placeholder="{{ texts.search_placeholder }}" required>
+            <button type="submit">{{ texts.search }}</button>
+        </form>
     </div>
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  </body>
+
+    <!-- 날씨 정보 -->
+    {% if weather %}
+        <div class="weather-container">
+            {% if weather.error %}
+                <p class="error">{{ weather.error }}</p>
+            {% else %}
+                <h2>{{ weather.city }}</h2>
+                <p><strong>온도:</strong> {{ weather.temperature }}°C</p>
+                <p><strong>체감온도:</strong> {{ weather.feels_like }}°C</p>
+                <p><strong>습도:</strong> {{ weather.humidity }}%</p>
+                <p><strong>기압:</strong> {{ weather.pressure }} hPa</p>
+                <p><strong>날씨:</strong> {{ weather.description }}</p>
+                <p><strong>미세먼지 (PM2.5):</strong> {{ weather.pm2_5 }} µg/m³</p>
+                <p><strong>미세먼지 (PM10):</strong> {{ weather.pm10 }} µg/m³</p>
+
+                <!-- 즐겨찾기 추가 버튼 -->
+                <form method="POST" action="/add_favorite">
+                    {{ csrf_token() }}
+                    <input type="hidden" name="city" value="{{ weather.city }}">
+                    <button type="submit">{{ texts.add_to_favorites }}</button>
+                </form>
+            {% endif %}
+        </div>
+
+        <!-- 지도 -->
+        {% if not weather.error %}
+            <div id="map"></div>
+            <script>
+                var lat = {{ weather.lat if weather.lat else 0 }};
+                var lon = {{ weather.lon if weather.lon else 0 }};
+                var map = L.map('map').setView([lat, lon], 14);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                }).addTo(map);
+                L.marker([lat, lon]).addTo(map)
+                    .bindPopup('<b>{{ weather.city }}</b><br>{{ weather.description }}')
+                    .openPopup();
+            </script>
+        {% endif %}
+    {% endif %}
+
+    <!-- 즐겨찾기 목록 -->
+    <div class="favorites-container">
+        <h2>{{ texts.favorites }}</h2>
+        <ul>
+            {% for city in favorites %}
+                <li>
+                    <form method="GET" action="{{ url_for('favorite_weather', city_name=city) }}" style="display:inline;">
+                        <button type="submit">{{ city }}</button>
+                    </form>
+                    
+                    <form method="POST" action="/remove_favorite" style="display:inline;">
+                        {{ csrf_token() }}
+                        <input type="hidden" name="city" value="{{ city }}">
+                        <button type="submit">{{ texts.delete }}</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
 </html>
